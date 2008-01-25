@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=gtranscode Video Transcoder
+Comment=Change the format of videos
+Exec=gtranscode
+Icon=@PACKAGE_PIXMAPS_DIR@/ 
+Terminal=false
+MultipleArgs=false
+Type=Application
+
