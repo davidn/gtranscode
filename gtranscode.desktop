@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=gtranscode Video Transcoder
+Comment=Change the format of videos
+Exec=gtranscode
+Icon=/usr/local/share/pixmaps/gtranscode/ 
+Terminal=false
+MultipleArgs=false
+Type=Application
+

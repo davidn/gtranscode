@@ -66,12 +66,14 @@ preferences.indent.closing=1
 
 module.include.name=include
 module.include.type=
-module.include.files=
+module.include.files=\
+	gtranscode.h
 
 module.source.name=src
 module.source.type=
 module.source.files=\
-	main.c
+	main.c\
+	gtranscode-transcode.c
 
 module.pixmap.name=pixmaps
 module.pixmap.type=
