@@ -94,6 +94,7 @@ AC_DEFINE_UNQUOTED(PACKAGE_SOURCE_DIR, "${packagesrcdir}")
 AC_OUTPUT([
 Makefile
 po/Makefile.in
+include/Makefile
 src/Makefile
 gtranscode.desktop
 ])

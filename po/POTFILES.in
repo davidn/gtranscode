@@ -6,5 +6,8 @@
 
 # Source files
 src/main.c
+src/gtranscode-transcode.c
+src/gtranscode-ui-handlers.c
+src/gtranscode-gst-handlers.c
 
 

@@ -225,7 +225,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = po src
+SUBDIRS = po include src
 gtranscodedocdir = ${prefix}/doc/gtranscode
 gtranscodedoc_DATA = \
 	README\

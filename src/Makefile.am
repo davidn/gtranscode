@@ -15,7 +15,10 @@ AM_CFLAGS =\
 bin_PROGRAMS = gtranscode
 
 gtranscode_SOURCES = \
-	main.c
+	main.c\
+	gtranscode-transcode.c\
+	gtranscode-ui-handlers.c\
+	gtranscode-gst-handlers.c
 
 gtranscode_LDFLAGS = \
 	-export-dynamic

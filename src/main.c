@@ -36,50 +36,24 @@ GstElement *pipeline;
 GladeXML *xml;
 
 GtranscodeElementFactory *
-gtranscode_element_factory_find (gchar * identifier)
+gtranscode_element_factory_add (GstElementFactory * element_factory, GList ** group)
 {
   GtranscodeElementFactory *result = g_new (GtranscodeElementFactory, 1);
-  result->ElementFactory = gst_element_factory_find (identifier);
+  result->ElementFactory = element_factory;
   result->name = gst_element_factory_get_longname (result->ElementFactory);
   result->allowed_audio_codecs = NULL;
   result->allowed_video_codecs = NULL;
   result->options = NULL;
   /*initiase options*/
-  return (result);
+  *group = g_list_append(*group, result);
+  return result;
 }
 
 GtranscodeElementFactory *
-gtranscode_element_factory_find_with_children (gchar * identifier)
+gtranscode_element_factory_add_with_children (GstElementFactory * element_factory, GList ** group)
 {
   GtranscodeElementFactory *result =
-    gtranscode_element_factory_find (identifier);
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("vorbisenc"));
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("speexenc"));
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("flacenc"));
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("alsasink"));
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("identity"));
-  result->allowed_audio_codecs =
-    g_list_append (result->allowed_audio_codecs,
-		   gtranscode_element_factory_find ("fakesink"));
-  result->allowed_video_codecs =
-    g_list_append (result->allowed_video_codecs,
-		   gtranscode_element_factory_find ("theoraenc"));
-  result->allowed_video_codecs =
-    g_list_append (result->allowed_video_codecs,
-		   gtranscode_element_factory_find ("xvimagesink"));
-  result->allowed_video_codecs =
-    g_list_append (result->allowed_video_codecs,
-		   gtranscode_element_factory_find ("aasink"));
+    gtranscode_element_factory_add (element_factory, group);
   return result;
 }
 
@@ -126,6 +100,29 @@ gint
     (GTK_TOGGLE_BUTTON (element_factory->toggle)) ? 0 : 1;
 }
 
+
+gboolean
+gtranscode_feature_filter_by_klass (GstPluginFeature * feature, gchar * class)
+{
+  const gchar *klass;
+  guint rank;
+
+  if (!GST_IS_ELEMENT_FACTORY (feature))
+    return FALSE;
+  klass = gst_element_factory_get_klass (GST_ELEMENT_FACTORY (feature));
+  if (g_strrstr (klass, class) == NULL )
+	  {
+    return FALSE;
+	  }
+
+  /* only select elements with autoplugging rank */
+  rank = gst_plugin_feature_get_rank (feature);
+  if (rank < GST_RANK_NONE)
+    return FALSE;
+
+  return TRUE;
+}
+
 void
 gtranscode_ui_update_toggles (GtkToggleButton * toggle_buttion)
 {
@@ -153,7 +150,6 @@ gtranscode_ui_update_toggles (GtkToggleButton * toggle_buttion)
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *window1;
   /*GstRegistry *registry; */
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -168,15 +164,26 @@ main (int argc, char *argv[])
   xml = glade_xml_new (PACKAGE_SOURCE_DIR "/gtranscode.glade", NULL, NULL);
   /* This is important */
   glade_xml_signal_autoconnect (xml);
-  window1 = glade_xml_get_widget (xml, "gtranscode_app");
-  gtk_widget_show (window1);
+  gtk_widget_show (glade_xml_get_widget (xml, "gtranscode_app"));
 
   /* Detect Gstreamer elements avilable */
-  sources =
-    g_list_append (sources, gtranscode_element_factory_find ("filesrc"));
-  containers =
-    g_list_append
-    (containers, gtranscode_element_factory_find_with_children ("oggmux"));
+  g_list_foreach (
+              gst_registry_feature_filter( gst_registry_get_default(),
+			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
+						 FALSE,
+						 "Source/File"),
+			  (GFunc) gtranscode_element_factory_add,
+			  &sources);
+  g_list_foreach (
+              gst_registry_feature_filter( gst_registry_get_default(),
+			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
+						 FALSE,
+						 "Codec/Muxer"),
+			  (GFunc) gtranscode_element_factory_add_with_children,
+			  &containers);
+			  
+    /*g_list_append
+    (containers, gtranscode_element_factory_find_with_children ("oggmux"));*/
 
   /* Set up ui for Gstreamer elements available */
   g_list_foreach

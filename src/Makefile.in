@@ -46,7 +46,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_gtranscode_OBJECTS = main.$(OBJEXT)
+am_gtranscode_OBJECTS = main.$(OBJEXT) gtranscode-transcode.$(OBJEXT) \
+	gtranscode-ui-handlers.$(OBJEXT) \
+	gtranscode-gst-handlers.$(OBJEXT)
 gtranscode_OBJECTS = $(am_gtranscode_OBJECTS)
 am__DEPENDENCIES_1 =
 gtranscode_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -216,7 +218,10 @@ AM_CFLAGS = \
 	 -g
 
 gtranscode_SOURCES = \
-	main.c
+	main.c\
+	gtranscode-transcode.c\
+	gtranscode-ui-handlers.c\
+	gtranscode-gst-handlers.c
 
 gtranscode_LDFLAGS = \
 	-export-dynamic
@@ -296,6 +301,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtranscode-gst-handlers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtranscode-transcode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtranscode-ui-handlers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .c.o:
