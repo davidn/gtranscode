@@ -1,6 +1,19 @@
-/* Created by Anjuta version 1.2.4a */
-/*	This file will not be overwritten */
-
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+ 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -18,7 +31,7 @@
 
 GList *sources = NULL, *containers = NULL;
 
-GstElement * pipeline;
+GstElement *pipeline;
 
 GladeXML *xml;
 
@@ -30,7 +43,9 @@ gtranscode_element_factory_find (gchar * identifier)
   result->name = gst_element_factory_get_longname (result->ElementFactory);
   result->allowed_audio_codecs = NULL;
   result->allowed_video_codecs = NULL;
-  return result;
+  result->options = NULL;
+  /*initiase options*/
+  return (result);
 }
 
 GtranscodeElementFactory *
@@ -134,59 +149,6 @@ gtranscode_ui_update_toggles (GtkToggleButton * toggle_buttion)
 								   "videocodec_vbox"));
 }
 
-void
-transcode_button_clicked (GtkButton * button)
-{
-  GstElementFactory *source_factory,
-    *container_factory,
-    *audio_codec_factory, *video_codec_factory, *sink_factory;
-  GtranscodeElementFactory *container_group;
-  GList *source_opts,
-    *container_opts, *audio_codec_opts, *video_codec_opts, *sink_opts;
-  gchar *filesrcopts[] = {
-    "location",
-    "/home/david/films/Ghostbusters.avi"
-  };
-  gchar *filesinkopts[] = {
-    "location",
-    "/tmp/gb.ogg"
-  };
-  source_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (sources, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
-  source_opts = NULL;
-  source_opts = g_list_append (source_opts, filesrcopts);
-  container_group =
-    (GtranscodeElementFactory
-     *) (g_list_find_custom (containers, NULL,
-			     (GCompareFunc)
-			     gtranscode_element_factory_is_enabled)->data);
-  container_factory = container_group->ElementFactory;
-  container_opts = NULL;
-  audio_codec_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (container_group->allowed_audio_codecs, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
-  audio_codec_opts = NULL;
-  video_codec_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (container_group->allowed_video_codecs, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
-  video_codec_opts = NULL;
-  sink_factory = gst_element_factory_find ("filesink");
-  sink_opts = NULL;
-  sink_opts = g_list_append (sink_opts, filesinkopts);
-  transcode (source_factory, source_opts, container_factory, container_opts,
-	     audio_codec_factory, audio_codec_opts, video_codec_factory,
-	     video_codec_opts, sink_factory, sink_opts);
-}
 
 int
 main (int argc, char *argv[])
@@ -230,9 +192,5 @@ main (int argc, char *argv[])
 		  (GFunc) gtranscode_ui_update_toggles, NULL);
 
   gtk_main ();
-  #ifdef DEBUG
-  g_printf ("Printing pipline.\n");
-  gst_xml_write_file (pipeline, g_fopen ("/tmp/out.xml", "w"));
-#endif
   return 0;
 }

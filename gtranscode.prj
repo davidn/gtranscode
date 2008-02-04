@@ -73,7 +73,9 @@ module.source.name=src
 module.source.type=
 module.source.files=\
 	main.c\
-	gtranscode-transcode.c
+	gtranscode-transcode.c\
+	gtranscode-ui-handlers.c\
+	gtranscode-gst-handlers.c
 
 module.pixmap.name=pixmaps
 module.pixmap.type=
