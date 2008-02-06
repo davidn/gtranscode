@@ -1,0 +1,12 @@
+
+[Anjuta]
+Maximized=1
+Geometry=1024x693+0+25
+
+[File Loader]
+Files=
+
+[Execution]
+Program arguments=
+Run in terminal=2
+Last selected uri=file:///home/david/Projects/gtranscode/src/gtranscode
