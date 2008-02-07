@@ -4,7 +4,7 @@ Maximized=1
 Geometry=1024x693+0+25
 
 [File Loader]
-Files=
+Files=file:///home/david/Projects/gtranscode/gtranscode.glade
 
 [Execution]
 Program arguments=

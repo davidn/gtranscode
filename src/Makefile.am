@@ -5,8 +5,9 @@
 ## 	Please disable it in the Anjuta project configuration
 
 INCLUDES = \
-	$(PACKAGE_CFLAGS)\
-	 -I/usr/include/gstreamer-0.10 -I/usr/include/glib-2.0
+	$(GLADE_CFLAGS)\
+	$(GNOME_CFLAGS)\
+	$(GSTREAMER_CFLAGS)
 
 AM_CFLAGS =\
 	 -Wall\
@@ -23,7 +24,8 @@ gtranscode_SOURCES = \
 gtranscode_LDFLAGS = \
 	-export-dynamic
 
-gtranscode_LDADD =  \
-	$(PACKAGE_LIBS)\
-	 -lgstreamer-0.10 -lglib-2.0
+gtranscode_LDADD = \
+	$(GLADE_LIBS) \
+	$(GNOME_LIBS) \
+	$(GSTREAMER_LIBS)
 
