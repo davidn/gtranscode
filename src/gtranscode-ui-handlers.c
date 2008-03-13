@@ -125,13 +125,12 @@ gtranscode_transcode_button_clicked (GtkButton * button)
   
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
-
 void
-gtranscode_options_button_clicked (GtkButton * button, gint * groupid)
+gtranscode_options_button_clicked_id (GtkButton * button, gint groupid)
 {
   GList *options = NULL;
 /*remove options from ui*/
-  switch (*groupid)
+  switch (groupid)
     {
     case 0:
       options = ((GtranscodeElementFactory
@@ -174,9 +173,32 @@ gtranscode_options_button_clicked (GtkButton * button, gint * groupid)
 		     data))->options;
       break;
     default:
-      g_printf ("Invalid option button clicked: %d\n", *groupid);
+      g_printf ("Invalid option button clicked: %d\n", groupid);
       return;
     }
 /*initiase options in ui*/
-  gtk_widget_show (glade_xml_get_widget (xml, "options_dialogue"));
+  gtk_widget_show (glade_xml_get_widget (xml, "options_dialog"));
+}
+void
+video_codec_options_button_clicked (GtkButton * button)
+{
+	gtranscode_options_button_clicked_id (button, 2);
+}
+
+void
+auido_codec_options_button_clicked (GtkButton * button)
+{
+	gtranscode_options_button_clicked_id (button, 3);
+}
+
+void
+containers_options_button_clicked (GtkButton * button)
+{
+	gtranscode_options_button_clicked_id (button, 1);
+}
+
+void
+sources_options_button_clicked (GtkButton * button)
+{
+	gtranscode_options_button_clicked_id (button, 0);
 }

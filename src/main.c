@@ -54,6 +54,31 @@ gtranscode_element_factory_add_with_children (GstElementFactory * element_factor
 {
   GtranscodeElementFactory *result =
     gtranscode_element_factory_add (element_factory, group);
+#ifdef AUTO_DETECT_PLUGINS
+	  g_list_foreach (
+              gst_registry_feature_filter( gst_registry_get_default(),
+			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
+						 FALSE,
+						 "Codec/Encoder/Audio"),
+			  (GFunc) gtranscode_element_factory_add,
+			  &result->allowed_audio_codecs);
+	  g_list_foreach (
+              gst_registry_feature_filter( gst_registry_get_default(),
+			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
+						 FALSE,
+						 "Codec/Encoder/Video"),
+			  (GFunc) gtranscode_element_factory_add,
+			  &result->allowed_video_codecs);
+#else
+	gtranscode_element_factory_add (
+				gst_element_factory_find("vorbisenc"),&result->allowed_audio_codecs);	
+	gtranscode_element_factory_add (
+				gst_element_factory_find("lame"),&result->allowed_audio_codecs);	
+	gtranscode_element_factory_add (
+				gst_element_factory_find("theoraenc"),&result->allowed_video_codecs);	
+	gtranscode_element_factory_add (
+				gst_element_factory_find("xvidenc"),&result->allowed_video_codecs);	
+#endif
   return result;
 }
 
@@ -167,6 +192,7 @@ main (int argc, char *argv[])
   gtk_widget_show (glade_xml_get_widget (xml, "gtranscode_app"));
 
   /* Detect Gstreamer elements avilable */
+#ifdef AUTO_DETECT_PLUGINS
   g_list_foreach (
               gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
@@ -181,23 +207,22 @@ main (int argc, char *argv[])
 						 "Codec/Muxer"),
 			  (GFunc) gtranscode_element_factory_add_with_children,
 			  &containers);
-			  
-    /*g_list_append
-    (containers, gtranscode_element_factory_find_with_children ("oggmux"));*/
-
+#else
+		gtranscode_element_factory_add_with_children (
+			     gst_element_factory_find("filesrc"),&sources);
+		gtranscode_element_factory_add_with_children (
+			     gst_element_factory_find("oggmux"),&containers);
+	gtranscode_element_factory_add_with_children (
+				gst_element_factory_find("avimux"),&containers);
+#endif
   /* Set up ui for Gstreamer elements available */
   g_list_foreach
     (sources,
      (GFunc) gtranscode_ui_add, glade_xml_get_widget (xml, "sources_hbox"));
   g_list_foreach (containers, (GFunc) gtranscode_ui_add,
-		  glade_xml_get_widget (xml, "container_hbox"));
+		  glade_xml_get_widget (xml, "container_box"));
   g_list_foreach (containers, (GFunc) gtranscode_ui_set_signal_toggle,
-		  glade_xml_get_widget (xml, "container_hbox"));
-  g_list_foreach (gtk_container_get_children
-		  (GTK_CONTAINER
-		   (glade_xml_get_widget (xml, "container_hbox"))),
-		  (GFunc) gtranscode_ui_update_toggles, NULL);
-
+		  glade_xml_get_widget (xml, "container_box"));
   gtk_main ();
   return 0;
 }
