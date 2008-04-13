@@ -56,13 +56,12 @@
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="left_padding">12</property>
                     <child>
-                      <widget class="GtkVBox" id="vbox2">
+                      <widget class="GtkHBox" id="sources_hbox">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
-                          <widget class="GtkHBox" id="sources_hbox">
+                          <widget class="GtkComboBox" id="sources_combobox">
                             <property name="visible">True</property>
-                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                           </widget>
                         </child>
                         <child>
@@ -115,13 +114,11 @@
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="left_padding">12</property>
                     <child>
-                      <widget class="GtkVBox" id="vbox3">
+                      <widget class="GtkHBox" id="hbox3">
                         <property name="visible">True</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
-                          <widget class="GtkVBox" id="container_box">
+                          <widget class="GtkComboBox" id="container_combobox">
                             <property name="visible">True</property>
-                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                           </widget>
                         </child>
                         <child>
@@ -181,13 +178,11 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="left_padding">12</property>
                         <child>
-                          <widget class="GtkVBox" id="vbox4">
+                          <widget class="GtkHBox" id="hbox4">
                             <property name="visible">True</property>
-                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <child>
-                              <widget class="GtkVBox" id="videocodec_vbox">
+                              <widget class="GtkComboBox" id="video_codec_combobox">
                                 <property name="visible">True</property>
-                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                               </widget>
                             </child>
                             <child>
@@ -240,13 +235,11 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="left_padding">12</property>
                         <child>
-                          <widget class="GtkVBox" id="vbox5">
+                          <widget class="GtkHBox" id="hbox5">
                             <property name="visible">True</property>
-                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <child>
-                              <widget class="GtkVBox" id="audiocodec_vbox">
+                              <widget class="GtkComboBox" id="audio_codec_combobox">
                                 <property name="visible">True</property>
-                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                               </widget>
                             </child>
                             <child>

@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
 <anjuta>
+    <plugin name="Macro Plugin" mandatory="no">
+        <require group="Anjuta Plugin"
+                 attribute="Location"
+                 value="anjuta-macro:MacroPlugin"/>
+    </plugin>
+    <plugin name="Patch Plugin" mandatory="no">
+        <require group="Anjuta Plugin"
+                 attribute="Location"
+                 value="anjuta-patch:PatchPlugin"/>
+    </plugin>
     <plugin name="Tools" mandatory="no">
         <require group="Anjuta Plugin"
                  attribute="Location"

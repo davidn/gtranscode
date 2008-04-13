@@ -3,7 +3,7 @@ dnl Created by Anjuta - will be overwritten
 dnl If you don't want it to overwrite it,
 dnl 	Please disable it in the Anjuta project configuration
 
-AC_INIT(configure.in)
+AC_INIT(gtranscode)
 AM_INIT_AUTOMAKE(gtranscode, 0.1)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
