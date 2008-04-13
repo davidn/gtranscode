@@ -25,7 +25,7 @@
 #include "../include/gtranscode.h"
 
 GstElement * pipeline;
-GList * sources, *containers;
+GtkListStore * sources, *containers;
 GladeXML * xml;
 
 void

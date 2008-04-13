@@ -25,25 +25,13 @@
 #ifndef _GTRANSCODE_H
 #define _GTRANSCODE_H
 
-typedef struct
-{
-  const gchar *name;
-  GtkRadioButton *toggle;
-  GstElementFactory *ElementFactory;
-  GList *allowed_video_codecs; /* of GtranscodeElementFactorys */
-  GList *allowed_audio_codecs; /* of GtranscodeElementFactorys */
-  GList *options; /* of array of 2 strings */
-} GtranscodeElementFactory;
-
-GtranscodeElementFactory *
-gtranscode_element_factory_add (GstElementFactory * element_factory,
-                         GList ** group);
-
-GtranscodeElementFactory *
-gtanscode_element_factory_add_with_children (GstElementFactory * element_factory,
-                         GList ** group);
-
 void gtranscode_object_set (gchar ** option_pair, gpointer object);
+
+void
+element_factory_add_to_gtk_list_store (GstElementFactory * element_factory, GtkListStore * group);
+
+void
+element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element_factory, GtkListStore * group);
 
 void
 pad_added (GstElement
@@ -67,15 +55,7 @@ GstElement *
    GList *
    video_codec_opts, GstElementFactory * sink_factory, GList * sink_opts);
 
-void
-  gtranscode_ui_add
-  (GtranscodeElementFactory * elementfactory, GtkContainer * container);
-
-gint
-  gtranscode_element_factory_is_enabled
-  (GtranscodeElementFactory * element_factory, gpointer data);
-
-void gtranscode_ui_update_toggles (GtkToggleButton * toggle_buttion);
+void gtranscode_ui_update (GtkComboBox * combo_box);
 
 void transcode_button_clicked (GtkButton * button);
 

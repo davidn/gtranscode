@@ -27,8 +27,27 @@
 #include "../include/gtranscode.h"
 
 GstElement * pipeline;
-GList * sources, *containers;
+GtkListStore * sources, *containers;
 GladeXML * xml;
+
+void
+gtranscode_ui_update (GtkComboBox * combo_box)
+{
+  GtkTreeIter iter;
+  GtkListStore* list_store;
+  GValue value = {0, };
+  gtk_combo_box_get_active_iter ( combo_box , &iter );
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (containers), &iter, 3, &value);
+  list_store = g_value_get_object(&value);
+  g_value_unset(&value);
+  gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "audio_codec_combobox")),
+						   GTK_TREE_MODEL (list_store));
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (containers), &iter, 4, &value);
+  list_store = g_value_get_object(&value);
+  g_value_unset(&value);
+  gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "video_codec_combobox")),
+						   GTK_TREE_MODEL (list_store));
+}
 
 
 gboolean gtranscode_ui_update_position (gpointer data)
@@ -65,48 +84,54 @@ gtranscode_transcode_button_clicked (GtkButton * button)
   GstElementFactory *source_factory,
     *container_factory,
     *audio_codec_factory, *video_codec_factory, *sink_factory;
-  GtranscodeElementFactory *container_group;
   GstElement * pipeline;
   GstBus * bus;
+  GValue value = {0, };
+  GtkTreeIter iter;
   GList *source_opts,
     *container_opts, *audio_codec_opts, *video_codec_opts, *sink_opts;
   gchar *filesrcopts[] = {
     "location",
-    "/home/david/films/Ghostbusters.avi"
+    "/home/david/films/Dogma.avi"
   };
   gchar *filesinkopts[] = {
     "location",
     "/tmp/gb.ogg"
   };
-  source_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (sources, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
+  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "sources_combobox"))
+								, &iter );
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (sources), &iter, 1, &value);
+  source_factory = g_value_get_pointer( &value);
   source_opts = NULL;
   source_opts = g_list_append (source_opts, filesrcopts);
-  container_group =
-    (GtranscodeElementFactory
-     *) (g_list_find_custom (containers, NULL,
-			     (GCompareFunc)
-			     gtranscode_element_factory_is_enabled)->data);
-  container_factory = container_group->ElementFactory;
+	
+	
+  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "container_combobox"))
+								, &iter );
+	g_value_unset(&value);
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (containers), &iter, 1, &value);
+  container_factory = g_value_get_pointer( &value);
   container_opts = NULL;
-  audio_codec_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (container_group->allowed_audio_codecs, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
+	
+	
+  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox"))
+								, &iter );
+	g_value_unset(&value);
+  gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox"))),
+							&iter, 1, &value);
+  audio_codec_factory = g_value_get_pointer( &value);
   audio_codec_opts = NULL;
-  video_codec_factory =
-    ((GtranscodeElementFactory
-      *) (g_list_find_custom (container_group->allowed_video_codecs, NULL,
-			      (GCompareFunc)
-			      gtranscode_element_factory_is_enabled)->data))->
-    ElementFactory;
+	
+	
+  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox"))
+								, &iter );
+	g_value_unset(&value);
+  gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox"))),
+							&iter, 1, &value);
+  video_codec_factory = g_value_get_pointer( &value);
   video_codec_opts = NULL;
+	
+	
   sink_factory = gst_element_factory_find ("filesink");
   sink_opts = NULL;
   sink_opts = g_list_append (sink_opts, filesinkopts);
@@ -128,54 +153,33 @@ gtranscode_transcode_button_clicked (GtkButton * button)
 void
 gtranscode_options_button_clicked_id (GtkButton * button, gint groupid)
 {
+  GtkTreeIter iter;
+  char * widget_name;
   GList *options = NULL;
 /*remove options from ui*/
   switch (groupid)
     {
     case 0:
-      options = ((GtranscodeElementFactory
-		 *) (g_list_find_custom (sources, NULL,
-					 (GCompareFunc)
-					 gtranscode_element_factory_is_enabled)->
-		     data))->options;
+      widget_name = "sources_combobox";
       break;
     case 1:
-      options = ((GtranscodeElementFactory
-		 *) (g_list_find_custom (containers, NULL,
-					 (GCompareFunc)
-					 gtranscode_element_factory_is_enabled)->
-		     data))->options;
+      widget_name = "containers_combobox";
       break;
     case 2:
-      options = ((GtranscodeElementFactory
-		 *) (g_list_find_custom (((GtranscodeElementFactory
-					  *) (g_list_find_custom (containers,
-								  NULL,
-								  (GCompareFunc)
-								  gtranscode_element_factory_is_enabled)->
-					      data))->allowed_video_codecs,
-					 NULL,
-					 (GCompareFunc)
-					 gtranscode_element_factory_is_enabled)->
-		     data))->options;
+      
+      widget_name = "video_combobox";
       break;
     case 3:
-      options = ((GtranscodeElementFactory
-		 *) (g_list_find_custom (((GtranscodeElementFactory
-					  *) (g_list_find_custom (containers,
-								  NULL,
-								  (GCompareFunc)
-								  gtranscode_element_factory_is_enabled)->
-					      data))->allowed_audio_codecs,
-					 NULL,
-					 (GCompareFunc)
-					 gtranscode_element_factory_is_enabled)->
-		     data))->options;
+      widget_name = "audio_combobox";
       break;
     default:
       g_printf ("Invalid option button clicked: %d\n", groupid);
       return;
     }
+  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))
+								, &iter );
+  gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))),
+							&iter, 3, options);
 /*initiase options in ui*/
   gtk_widget_show (glade_xml_get_widget (xml, "options_dialog"));
 }
@@ -186,7 +190,7 @@ video_codec_options_button_clicked (GtkButton * button)
 }
 
 void
-auido_codec_options_button_clicked (GtkButton * button)
+audio_codec_options_button_clicked (GtkButton * button)
 {
 	gtranscode_options_button_clicked_id (button, 3);
 }

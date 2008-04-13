@@ -28,103 +28,68 @@
 
 #include "../include/gtranscode.h"
 
-
-GList *sources = NULL, *containers = NULL;
+//									char* name, GstElementFactory* element_factory, GList* options ,GtkListStore allowed_audio_codecs, GtkListStore allowed_video_codecs)
+GtkListStore * sources;
+GtkListStore * containers;
 
 GstElement *pipeline;
 
 GladeXML *xml;
 
-GtranscodeElementFactory *
-gtranscode_element_factory_add (GstElementFactory * element_factory, GList ** group)
+void
+element_factory_add_to_gtk_list_store (GstElementFactory * element_factory, GtkListStore * group)
 {
-  GtranscodeElementFactory *result = g_new (GtranscodeElementFactory, 1);
-  result->ElementFactory = element_factory;
-  result->name = gst_element_factory_get_longname (result->ElementFactory);
-  result->allowed_audio_codecs = NULL;
-  result->allowed_video_codecs = NULL;
-  result->options = NULL;
+  GtkTreeIter iter;
+	
+  gtk_list_store_append( GTK_LIST_STORE (group), &iter);
+  gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
+					  0, gst_element_factory_get_longname (element_factory),
+					  1, element_factory,
+					  2, NULL,
+					  3, NULL,
+					  4, NULL, -1);
   /*initiase options*/
-  *group = g_list_append(*group, result);
-  return result;
 }
 
-GtranscodeElementFactory *
-gtranscode_element_factory_add_with_children (GstElementFactory * element_factory, GList ** group)
+void
+element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element_factory, GtkListStore * group)
 {
-  GtranscodeElementFactory *result =
-    gtranscode_element_factory_add (element_factory, group);
+  GtkTreeIter iter;
+  GtkListStore * audio_codecs = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
+  GtkListStore * video_codecs = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
 #ifdef AUTO_DETECT_PLUGINS
 	  g_list_foreach (
               gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
 						 "Codec/Encoder/Audio"),
-			  (GFunc) gtranscode_element_factory_add,
-			  &result->allowed_audio_codecs);
+			  (GFunc) element_factory_add_to_gtk_list_store,
+			  audio_codecs);
 	  g_list_foreach (
               gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
 						 "Codec/Encoder/Video"),
-			  (GFunc) gtranscode_element_factory_add,
-			  &result->allowed_video_codecs);
+			  (GFunc) element_factory_add_to_gtk_list_store,
+			  video_codecs);
 #else
-	gtranscode_element_factory_add (
-				gst_element_factory_find("vorbisenc"),&result->allowed_audio_codecs);	
-	gtranscode_element_factory_add (
-				gst_element_factory_find("lame"),&result->allowed_audio_codecs);	
-	gtranscode_element_factory_add (
-				gst_element_factory_find("theoraenc"),&result->allowed_video_codecs);	
-	gtranscode_element_factory_add (
-				gst_element_factory_find("xvidenc"),&result->allowed_video_codecs);	
+	element_factory_add_to_gtk_list_store (
+				gst_element_factory_find("vorbisenc"),audio_codecs);	
+	element_factory_add_to_gtk_list_store (
+				gst_element_factory_find("lame"),audio_codecs);	
+	element_factory_add_to_gtk_list_store (
+				gst_element_factory_find("theoraenc"),video_codecs);	
+	element_factory_add_to_gtk_list_store (
+				gst_element_factory_find("xvidenc"),video_codecs);	
 #endif
-  return result;
+  gtk_list_store_append( GTK_LIST_STORE (group), &iter);
+  gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
+					  0, gst_element_factory_get_longname (element_factory),
+					  1, element_factory,
+					  2, NULL,
+					  3, audio_codecs,
+					  4, video_codecs, -1);
 }
-
-void
-  gtranscode_ui_add
-  (GtranscodeElementFactory * elementfactory, GtkContainer * container)
-{
-  GList *siblings;
-  GSList *radiogroup;
-#ifdef DEBUG
-  g_printf ("adding %s\n", elementfactory->name);
-#endif
-  siblings = gtk_container_get_children (container);
-  if (g_list_length (siblings) == 0)
-    {
-      radiogroup = NULL;
-    }
-  else
-    {
-      radiogroup = gtk_radio_button_get_group (siblings->data);
-    }
-  elementfactory->toggle =
-    GTK_RADIO_BUTTON (gtk_radio_button_new_with_label
-		      (radiogroup, elementfactory->name));
-
-  gtk_container_add (container, GTK_WIDGET (elementfactory->toggle));
-  gtk_widget_show (GTK_WIDGET (elementfactory->toggle));
-}
-
-void
-gtranscode_ui_set_signal_toggle (GtranscodeElementFactory * element_factory,
-				 gpointer data)
-{
-  g_signal_connect (element_factory->toggle, "toggled",
-		    (GCallback) gtranscode_ui_update_toggles, NULL);
-}
-
-gint
-  gtranscode_element_factory_is_enabled
-  (GtranscodeElementFactory * element_factory, gpointer data)
-{
-  return
-    gtk_toggle_button_get_active
-    (GTK_TOGGLE_BUTTON (element_factory->toggle)) ? 0 : 1;
-}
-
 
 gboolean
 gtranscode_feature_filter_by_klass (GstPluginFeature * feature, gchar * class)
@@ -148,34 +113,12 @@ gtranscode_feature_filter_by_klass (GstPluginFeature * feature, gchar * class)
   return TRUE;
 }
 
-void
-gtranscode_ui_update_toggles (GtkToggleButton * toggle_buttion)
-{
-  GtranscodeElementFactory *container_factory =
-    g_list_find_custom (containers, NULL,
-			(GCompareFunc)
-			gtranscode_element_factory_is_enabled)->data;
-  g_list_foreach (gtk_container_get_children
-		  (GTK_CONTAINER
-		   (glade_xml_get_widget (xml, "audiocodec_vbox"))),
-		  (GFunc) gtk_widget_destroy, NULL);
-  g_list_foreach (gtk_container_get_children
-		  (GTK_CONTAINER
-		   (glade_xml_get_widget (xml, "videocodec_vbox"))),
-		  (GFunc) gtk_widget_destroy, NULL);
-  g_list_foreach (container_factory->allowed_audio_codecs,
-		  (GFunc) gtranscode_ui_add, glade_xml_get_widget (xml,
-								   "audiocodec_vbox"));
-  g_list_foreach (container_factory->allowed_video_codecs,
-		  (GFunc) gtranscode_ui_add, glade_xml_get_widget (xml,
-								   "videocodec_vbox"));
-}
-
-
 int
 main (int argc, char *argv[])
 {
   /*GstRegistry *registry; */
+	GtkCellRenderer * text_renderer;
+	GtkCellLayout * cell_layout;
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
   textdomain (PACKAGE);
@@ -191,6 +134,9 @@ main (int argc, char *argv[])
   glade_xml_signal_autoconnect (xml);
   gtk_widget_show (glade_xml_get_widget (xml, "gtranscode_app"));
 
+	sources = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER , G_TYPE_OBJECT, G_TYPE_OBJECT);
+	containers = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER , G_TYPE_OBJECT, G_TYPE_OBJECT);
+	
   /* Detect Gstreamer elements avilable */
 #ifdef AUTO_DETECT_PLUGINS
   g_list_foreach (
@@ -198,31 +144,58 @@ main (int argc, char *argv[])
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
 						 "Source/File"),
-			  (GFunc) gtranscode_element_factory_add,
-			  &sources);
+			  (GFunc) element_factory_add_to_gtk_list_store,
+			  sources);
   g_list_foreach (
               gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
 						 "Codec/Muxer"),
-			  (GFunc) gtranscode_element_factory_add_with_children,
-			  &containers);
+			  (GFunc) element_factory_add_to_gtk_list_store_with_children ,
+			  containers);
 #else
-		gtranscode_element_factory_add_with_children (
-			     gst_element_factory_find("filesrc"),&sources);
-		gtranscode_element_factory_add_with_children (
-			     gst_element_factory_find("oggmux"),&containers);
-	gtranscode_element_factory_add_with_children (
-				gst_element_factory_find("avimux"),&containers);
+		element_factory_add_to_gtk_list_store (
+			     gst_element_factory_find("filesrc"),sources);
+		element_factory_add_to_gtk_list_store_with_children (
+			     gst_element_factory_find("oggmux"),containers);
+	element_factory_add_to_gtk_list_store_with_children (
+				gst_element_factory_find("avimux"),containers);
 #endif
   /* Set up ui for Gstreamer elements available */
-  g_list_foreach
-    (sources,
-     (GFunc) gtranscode_ui_add, glade_xml_get_widget (xml, "sources_hbox"));
-  g_list_foreach (containers, (GFunc) gtranscode_ui_add,
-		  glade_xml_get_widget (xml, "container_box"));
-  g_list_foreach (containers, (GFunc) gtranscode_ui_set_signal_toggle,
-		  glade_xml_get_widget (xml, "container_box"));
+	text_renderer = gtk_cell_renderer_text_new();
+	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "sources_combobox"));
+	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
+  gtk_cell_layout_set_attributes ( cell_layout ,
+								  text_renderer,
+								  "text",
+								  0,NULL);
+
+	text_renderer = gtk_cell_renderer_text_new();
+	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "container_combobox"));
+	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
+  gtk_cell_layout_set_attributes ( cell_layout ,
+								  text_renderer,
+								  "text",
+								  0,NULL);
+	text_renderer = gtk_cell_renderer_text_new();
+	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "audio_codec_combobox"));
+	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
+  gtk_cell_layout_set_attributes ( cell_layout ,
+								  text_renderer,
+								  "text",
+								  0,NULL);
+	text_renderer = gtk_cell_renderer_text_new();
+	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "video_codec_combobox"));
+	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
+  gtk_cell_layout_set_attributes ( cell_layout ,
+								  text_renderer,
+								  "text",
+								  0,NULL);
+	
+  gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "sources_combobox")),
+						   GTK_TREE_MODEL (sources));
+  gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "container_combobox")),
+						   GTK_TREE_MODEL (containers));
   gtk_main ();
   return 0;
 }

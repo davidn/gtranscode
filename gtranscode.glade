@@ -119,6 +119,7 @@
                         <child>
                           <widget class="GtkComboBox" id="container_combobox">
                             <property name="visible">True</property>
+                            <signal name="changed" handler="gtranscode_ui_update"/>
                           </widget>
                         </child>
                         <child>
