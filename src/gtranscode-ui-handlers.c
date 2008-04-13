@@ -154,6 +154,7 @@ void
 gtranscode_options_button_clicked_id (GtkButton * button, gint groupid)
 {
   GtkTreeIter iter;
+  GValue value = {0, };
   char * widget_name;
   GList *options = NULL;
 /*remove options from ui*/
@@ -179,7 +180,9 @@ gtranscode_options_button_clicked_id (GtkButton * button, gint groupid)
   gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))
 								, &iter );
   gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))),
-							&iter, 3, options);
+							&iter, 2, &value);
+	options = g_value_get_pointer(&value);
+	
 /*initiase options in ui*/
   gtk_widget_show (glade_xml_get_widget (xml, "options_dialog"));
 }
