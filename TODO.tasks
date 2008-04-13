@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <gtodo>
-  <category title="Personal" place="0"/>
+  <category title="Personal" place="0">
+    <item>
+      <attribute id="1208111424" priority="1" done="0" start_date="733145" enddate="99999999" notify="0" endtime="-60" last_edited="1208111424"/>
+      <summary>Options</summary>
+      <comment/>
+    </item>
+    <item>
+      <attribute id="1208111447" priority="1" done="0" start_date="733145" enddate="99999999" notify="0" endtime="-60" last_edited="1208111447"/>
+      <summary>Filter Codecs more</summary>
+      <comment></comment>
+    </item>
+  </category>
   <category title="Business" place="1"/>
   <category title="Unfiled" place="2"/>
 </gtodo>
