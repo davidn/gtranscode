@@ -38,7 +38,7 @@ gtranscode_static_pad_template_get_to_list (GstStaticPadTemplate * static_pad_te
 										 GList ** pad_template_list);
 
 gboolean
-gtranscode_pad_templates_is_src (GstPadTemplate * pad_template, gpointer user_data);
+gtranscode_pad_templates_is_sink (GstPadTemplate * pad_template, gpointer user_data);
 
 void
 gtranscode_static_pad_template_get_to_list (GstStaticPadTemplate * static_pad_template,

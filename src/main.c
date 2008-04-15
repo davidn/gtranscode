@@ -63,8 +63,8 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 
   const GList * static_pad_templates = NULL;
   GList * pad_templates = NULL;
-  GList * src_pad_templates = NULL;
-  GList * src_caps = NULL;
+  GList * sink_pad_templates = NULL;
+  GList * sink_caps = NULL;
   GList * audio_codecs = gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
@@ -79,23 +79,23 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 		g_list_foreach ( (GList *) static_pad_templates,
 									(GFunc) gtranscode_static_pad_template_get_to_list,
 									&pad_templates);
-	src_pad_templates = gst_filter_run(pad_templates,
-										  (GstFilterFunc) gtranscode_pad_templates_is_src,
+	sink_pad_templates = gst_filter_run(pad_templates,
+										  (GstFilterFunc) gtranscode_pad_templates_is_sink,
 								   TRUE,
 								   NULL);
-	g_list_foreach (src_pad_templates,
+	g_list_foreach (sink_pad_templates,
 									 (GFunc) gtranscode_pad_template_get_caps_to_list,
-									 &src_caps);
+									 &sink_caps);
 	
 
 	audio_codecs = gst_filter_run (audio_codecs,
 								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
 								   TRUE,
-								   src_caps);
+								   sink_caps);
 	video_codecs = gst_filter_run (video_codecs,
 								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
 								   TRUE,
-								   src_caps);
+								   sink_caps);
 	  g_list_foreach ( audio_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
 			  audio_codecs_list_store);
@@ -122,9 +122,9 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 }
 
 gboolean
-gtranscode_pad_templates_is_src (GstPadTemplate * pad_template, gpointer user_data)
+gtranscode_pad_templates_is_sink (GstPadTemplate * pad_template, gpointer user_data)
 {
-	return (GST_PAD_TEMPLATE_DIRECTION(pad_template) == GST_PAD_SRC) ? TRUE : FALSE;
+	return (GST_PAD_TEMPLATE_DIRECTION(pad_template) == GST_PAD_SINK) ? TRUE : FALSE;
 }
 
 void
