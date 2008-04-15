@@ -56,9 +56,9 @@ void
 element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element_factory, GtkListStore * group)
 {
   GtkTreeIter iter;
-  GtkListStore * audio_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
-  GtkListStore * video_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
-  const GList * static_pad_templates = NULL;
+  GtkListStore * audio_codecs_list_store;
+  GtkListStore * video_codecs_list_store;
+  GList * static_pad_templates = NULL;
   GList * pad_templates = NULL;
   GList * sink_pad_templates = NULL;
   GList * sink_caps = NULL;
@@ -72,8 +72,8 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 						 "Codec/Encoder/Video");
 	
 	
-		static_pad_templates = gst_element_factory_get_static_pad_templates(element_factory);
-		g_list_foreach ( (GList *) static_pad_templates,
+		static_pad_templates = (GList *) gst_element_factory_get_static_pad_templates(element_factory);
+		g_list_foreach (static_pad_templates,
 									(GFunc) gtranscode_static_pad_template_get_to_list,
 									&pad_templates);
 	sink_pad_templates = gst_filter_run(pad_templates,
@@ -93,20 +93,32 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 								   (GstFilterFunc) gtranscode_element_factory_can_src_caps,
 								   FALSE,
 								   sink_caps);
+	
+	if (g_list_length(audio_codecs) > 0 && g_list_length(video_codecs) > 0)
+	{
+	  audio_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
+	  video_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
 	  g_list_foreach ( audio_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
 			  audio_codecs_list_store);
 	  g_list_foreach (video_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
 			  video_codecs_list_store);
-
-  gtk_list_store_append( GTK_LIST_STORE (group), &iter);
-  gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
+	  gtk_list_store_append( GTK_LIST_STORE (group), &iter);
+	  gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
 					  0, gst_element_factory_get_longname (element_factory),
 					  1, element_factory,
 					  2, NULL,
 					  3, audio_codecs_list_store,
 					  4, video_codecs_list_store, -1);
+	}
+	
+	g_list_free(static_pad_templates);
+	g_list_free(pad_templates);
+	g_list_free(sink_pad_templates);
+	g_list_free(sink_caps);
+	g_list_free(audio_codecs);
+	g_list_free(video_codecs);
 }
 
 gboolean
