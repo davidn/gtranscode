@@ -11,7 +11,8 @@ INCLUDES = \
 
 AM_CFLAGS = \
 	 -Wall \
-	 -g
+	 -g \
+	 -O0
 
 bin_PROGRAMS = gtranscode
 
