@@ -7,8 +7,12 @@ SUBDIRS = po include src
 
 gtranscodedocdir = ${prefix}/doc/gtranscode
 gtranscodedoc_DATA = \
+	README\
 	COPYING\
-	INSTALL
+	AUTHORS\
+	ChangeLog\
+	INSTALL\
+	NEWS
 
 gnomemenudir = $(prefix)/@NO_PREFIX_PACKAGE_MENU_DIR@/Multimedia
 gnomemenu_DATA = gtranscode.desktop
@@ -20,7 +24,8 @@ AM_GCJFLAGS =
 
 AM_CXXFLAGS = 
 
-AM_CFLAGS = 
+AM_CFLAGS = \
+	-O0
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:
