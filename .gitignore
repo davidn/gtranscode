@@ -1,5 +1,9 @@
 *
 !.gitignore
+!NEWS
+!AUTHORS
+!ChangeLog
+!README
 !COPYING
 !INSTALL
 !Makefile.am
