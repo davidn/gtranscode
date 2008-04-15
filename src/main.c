@@ -19,10 +19,12 @@
 #endif
 
 #define DEBUG TRUE
+#define AUTO_DETECT_PLUGINS
 
 #include <gnome.h>
 #include <glade/glade.h>
 #include <gst/gst.h>
+#include <gst/gstfilter.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 
@@ -55,40 +57,102 @@ void
 element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element_factory, GtkListStore * group)
 {
   GtkTreeIter iter;
-  GtkListStore * audio_codecs = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
-  GtkListStore * video_codecs = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
+  GtkListStore * audio_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
+  GtkListStore * video_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
 #ifdef AUTO_DETECT_PLUGINS
-	  g_list_foreach (
-              gst_registry_feature_filter( gst_registry_get_default(),
+
+  const GList * static_pad_templates = NULL;
+  GList * pad_templates = NULL;
+  GList * src_pad_templates = NULL;
+  GList * src_caps = NULL;
+  GList * audio_codecs = gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
-						 "Codec/Encoder/Audio"),
-			  (GFunc) element_factory_add_to_gtk_list_store,
-			  audio_codecs);
-	  g_list_foreach (
-              gst_registry_feature_filter( gst_registry_get_default(),
+						 "Codec/Encoder/Audio");
+  GList * video_codecs = gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
 						 FALSE,
-						 "Codec/Encoder/Video"),
+						 "Codec/Encoder/Video");
+	
+	
+		static_pad_templates = gst_element_factory_get_static_pad_templates(element_factory);
+		g_list_foreach ( (GList *) static_pad_templates,
+									(GFunc) gtranscode_static_pad_template_get_to_list,
+									&pad_templates);
+	src_pad_templates = gst_filter_run(pad_templates,
+										  (GstFilterFunc) gtranscode_pad_templates_is_src,
+								   TRUE,
+								   NULL);
+	g_list_foreach (src_pad_templates,
+									 (GFunc) gtranscode_pad_template_get_caps_to_list,
+									 &src_caps);
+	
+
+	audio_codecs = gst_filter_run (audio_codecs,
+								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
+								   TRUE,
+								   src_caps);
+	video_codecs = gst_filter_run (video_codecs,
+								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
+								   TRUE,
+								   src_caps);
+	  g_list_foreach ( audio_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
-			  video_codecs);
+			  audio_codecs_list_store);
+	  g_list_foreach (video_codecs,
+			  (GFunc) element_factory_add_to_gtk_list_store,
+			  video_codecs_list_store);
 #else
 	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("vorbisenc"),audio_codecs);	
+				gst_element_factory_find("vorbisenc"),audio_codecs_list_store);	
 	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("lame"),audio_codecs);	
+				gst_element_factory_find("lame"),audio_codecs_list_store);	
 	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("theoraenc"),video_codecs);	
+				gst_element_factory_find("theoraenc"),video_codecs_list_store);	
 	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("xvidenc"),video_codecs);	
+				gst_element_factory_find("xvidenc"),video_codecs_list_store);	
 #endif
   gtk_list_store_append( GTK_LIST_STORE (group), &iter);
   gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
 					  0, gst_element_factory_get_longname (element_factory),
 					  1, element_factory,
 					  2, NULL,
-					  3, audio_codecs,
-					  4, video_codecs, -1);
+					  3, audio_codecs_list_store,
+					  4, video_codecs_list_store, -1);
+}
+
+gboolean
+gtranscode_pad_templates_is_src (GstPadTemplate * pad_template, gpointer user_data)
+{
+	return (GST_PAD_TEMPLATE_DIRECTION(pad_template) == GST_PAD_SRC) ? TRUE : FALSE;
+}
+
+void
+gtranscode_static_pad_template_get_to_list (GstStaticPadTemplate * static_pad_template,
+										 GList ** pad_template_list)
+{
+	*pad_template_list = g_list_append(*pad_template_list, gst_static_pad_template_get(static_pad_template));
+}
+
+void
+gtranscode_pad_template_get_caps_to_list (GstPadTemplate * pad_template,
+									   GList ** caps_list)
+{
+	*caps_list = g_list_append(*caps_list, gst_pad_template_get_caps ( pad_template ));
+}
+
+gboolean
+gtranscode_element_factory_can_sink_caps (GstElementFactory * element_factory, GList * caps )
+{
+	do
+	{
+		if ( gst_element_factory_can_sink_caps ( element_factory , caps->data ) == TRUE)
+		{
+			return TRUE;
+		}
+	}
+	while ((caps = g_list_next(caps)) != NULL );
+	return FALSE;
 }
 
 gboolean

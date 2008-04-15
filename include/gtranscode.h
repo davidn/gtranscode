@@ -34,6 +34,24 @@ void
 element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element_factory, GtkListStore * group);
 
 void
+gtranscode_static_pad_template_get_to_list (GstStaticPadTemplate * static_pad_template,
+										 GList ** pad_template_list);
+
+gboolean
+gtranscode_pad_templates_is_src (GstPadTemplate * pad_template, gpointer user_data);
+
+void
+gtranscode_static_pad_template_get_to_list (GstStaticPadTemplate * static_pad_template,
+										 GList ** pad_template_list);
+
+void
+gtranscode_pad_template_get_caps_to_list (GstPadTemplate * pad_template,
+									   GList ** caps_list);
+
+gboolean
+gtranscode_element_factory_can_sink_caps (GstElementFactory * element_factory, GList * caps );
+
+void
 pad_added (GstElement
 	   * element1, GstPad * pad, gboolean arg1, GstElement * element2);
 
