@@ -9,8 +9,8 @@ INCLUDES = \
 	$(GNOME_CFLAGS)\
 	$(GSTREAMER_CFLAGS)
 
-AM_CFLAGS =\
-	 -Wall\
+AM_CFLAGS = \
+	 -Wall \
 	 -g
 
 bin_PROGRAMS = gtranscode
@@ -28,4 +28,6 @@ gtranscode_LDADD = \
 	$(GLADE_LIBS) \
 	$(GNOME_LIBS) \
 	$(GSTREAMER_LIBS)
+
+AM_GCJFLAGS = 
 
