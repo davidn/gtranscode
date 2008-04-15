@@ -81,7 +81,7 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 									&pad_templates);
 	sink_pad_templates = gst_filter_run(pad_templates,
 										  (GstFilterFunc) gtranscode_pad_templates_is_sink,
-								   TRUE,
+								   FALSE,
 								   NULL);
 	g_list_foreach (sink_pad_templates,
 									 (GFunc) gtranscode_pad_template_get_caps_to_list,
@@ -90,11 +90,11 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 
 	audio_codecs = gst_filter_run (audio_codecs,
 								   (GstFilterFunc) gtranscode_element_factory_can_src_caps,
-								   TRUE,
+								   FALSE,
 								   sink_caps);
 	video_codecs = gst_filter_run (video_codecs,
 								   (GstFilterFunc) gtranscode_element_factory_can_src_caps,
-								   TRUE,
+								   FALSE,
 								   sink_caps);
 	  g_list_foreach ( audio_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
