@@ -89,11 +89,11 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 	
 
 	audio_codecs = gst_filter_run (audio_codecs,
-								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
+								   (GstFilterFunc) gtranscode_element_factory_can_src_caps,
 								   TRUE,
 								   sink_caps);
 	video_codecs = gst_filter_run (video_codecs,
-								   (GstFilterFunc) gtranscode_element_factory_can_sink_caps,
+								   (GstFilterFunc) gtranscode_element_factory_can_src_caps,
 								   TRUE,
 								   sink_caps);
 	  g_list_foreach ( audio_codecs,
@@ -142,11 +142,11 @@ gtranscode_pad_template_get_caps_to_list (GstPadTemplate * pad_template,
 }
 
 gboolean
-gtranscode_element_factory_can_sink_caps (GstElementFactory * element_factory, GList * caps )
+gtranscode_element_factory_can_src_caps (GstElementFactory * element_factory, GList * caps )
 {
 	do
 	{
-		if ( gst_element_factory_can_sink_caps ( element_factory , caps->data ) == TRUE)
+		if ( gst_element_factory_can_src_caps ( element_factory , caps->data ) == TRUE)
 		{
 			return TRUE;
 		}
