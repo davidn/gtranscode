@@ -49,7 +49,7 @@ gtranscode_pad_template_get_caps_to_list (GstPadTemplate * pad_template,
 									   GList ** caps_list);
 
 gboolean
-gtranscode_element_factory_can_sink_caps (GstElementFactory * element_factory, GList * caps );
+gtranscode_element_factory_can_src_caps (GstElementFactory * element_factory, GList * caps );
 
 void
 pad_added (GstElement
