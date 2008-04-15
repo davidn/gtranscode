@@ -19,7 +19,6 @@
 #endif
 
 #define DEBUG TRUE
-#define AUTO_DETECT_PLUGINS
 
 #include <gnome.h>
 #include <glade/glade.h>
@@ -59,8 +58,6 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
   GtkTreeIter iter;
   GtkListStore * audio_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
   GtkListStore * video_codecs_list_store = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_OBJECT, G_TYPE_OBJECT );
-#ifdef AUTO_DETECT_PLUGINS
-
   const GList * static_pad_templates = NULL;
   GList * pad_templates = NULL;
   GList * sink_pad_templates = NULL;
@@ -102,16 +99,7 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 	  g_list_foreach (video_codecs,
 			  (GFunc) element_factory_add_to_gtk_list_store,
 			  video_codecs_list_store);
-#else
-	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("vorbisenc"),audio_codecs_list_store);	
-	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("lame"),audio_codecs_list_store);	
-	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("theoraenc"),video_codecs_list_store);	
-	element_factory_add_to_gtk_list_store (
-				gst_element_factory_find("xvidenc"),video_codecs_list_store);	
-#endif
+
   gtk_list_store_append( GTK_LIST_STORE (group), &iter);
   gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
 					  0, gst_element_factory_get_longname (element_factory),
@@ -202,7 +190,6 @@ main (int argc, char *argv[])
 	containers = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER , G_TYPE_OBJECT, G_TYPE_OBJECT);
 	
   /* Detect Gstreamer elements avilable */
-#ifdef AUTO_DETECT_PLUGINS
   g_list_foreach (
               gst_registry_feature_filter( gst_registry_get_default(),
 			             (GstPluginFeatureFilter) gtranscode_feature_filter_by_klass,
@@ -217,14 +204,7 @@ main (int argc, char *argv[])
 						 "Codec/Muxer"),
 			  (GFunc) element_factory_add_to_gtk_list_store_with_children ,
 			  containers);
-#else
-		element_factory_add_to_gtk_list_store (
-			     gst_element_factory_find("filesrc"),sources);
-		element_factory_add_to_gtk_list_store_with_children (
-			     gst_element_factory_find("oggmux"),containers);
-	element_factory_add_to_gtk_list_store_with_children (
-				gst_element_factory_find("avimux"),containers);
-#endif
+
   /* Set up ui for Gstreamer elements available */
 	text_renderer = gtk_cell_renderer_text_new();
 	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "sources_combobox"));
