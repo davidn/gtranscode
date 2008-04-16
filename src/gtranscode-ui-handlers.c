@@ -157,6 +157,7 @@ gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
     GstElementFactory * element_factory;
     GValue value = {0, };
     GList *options = NULL;
+    GtkDialog * option_window;
     if (gtk_combo_box_get_active_iter (widget,
                                        &iter ) == FALSE )
     {
@@ -171,9 +172,21 @@ gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
     element_factory = g_value_get_pointer(&value);
     
     /*initiase options in ui*/
-    gtk_label_set_text (GTK_LABEL (glade_xml_get_widget(xml, "optionslabel")),
-                        g_strconcat("Set options for ",
-                                    gst_element_factory_get_longname( element_factory),
-                                    NULL));
-    gtk_widget_show (glade_xml_get_widget (xml, "options_dialog"));
+    
+    option_window = gtk_dialog_new_with_buttons (NULL,
+                                                 NULL,
+                                                 GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                 GTK_STOCK_OK,
+                                                 GTK_RESPONSE_ACCEPT,
+                                                 GTK_STOCK_CANCEL,
+                                                 GTK_RESPONSE_REJECT,
+                                                 NULL);
+    switch (gtk_dialog_run(option_window))
+    {
+        case GTK_RESPONSE_ACCEPT:
+        break;
+        default:
+        break;
+    }
+    gtk_widget_destroy(option_window);
 }

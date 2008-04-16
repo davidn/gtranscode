@@ -121,6 +121,12 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
     g_list_free(video_codecs);
 }
 
+GList *
+gtranscode_element_factory_get_options (GstElementFactory * element_factory)
+{
+    
+}
+
 gboolean
 gtranscode_pad_templates_is_sink (GstPadTemplate * pad_template, gpointer user_data)
 {
