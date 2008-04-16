@@ -151,61 +151,29 @@ gtranscode_transcode_button_clicked (GtkButton * button)
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
 void
-gtranscode_options_button_clicked_id (GtkButton * button, gint groupid)
+gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
 {
   GtkTreeIter iter;
+  GstElementFactory * element_factory;
   GValue value = {0, };
-  char * widget_name;
   GList *options = NULL;
-/*remove options from ui*/
-  switch (groupid)
+  if (gtk_combo_box_get_active_iter (widget,
+                                 &iter ) == FALSE )
     {
-    case 0:
-      widget_name = "sources_combobox";
-      break;
-    case 1:
-      widget_name = "containers_combobox";
-      break;
-    case 2:
-      
-      widget_name = "video_combobox";
-      break;
-    case 3:
-      widget_name = "audio_combobox";
-      break;
-    default:
-      g_printf ("Invalid option button clicked: %d\n", groupid);
-      return;
+        return;
     }
-  gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))
-								, &iter );
-  gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, widget_name))),
-							&iter, 2, &value);
+  gtk_tree_model_get_value (gtk_combo_box_get_model(widget),
+                            &iter, 2, &value);
 	options = g_value_get_pointer(&value);
+  g_value_unset(&value);
+  gtk_tree_model_get_value (gtk_combo_box_get_model(widget),
+                            &iter, 1, &value);
+	element_factory = g_value_get_pointer(&value);
 	
 /*initiase options in ui*/
+  gtk_label_set_text (GTK_LABEL (glade_xml_get_widget(xml, "optionslabel")),
+                      g_strconcat("Set options for ",
+                                  gst_element_factory_get_longname( element_factory),
+                                  NULL));
   gtk_widget_show (glade_xml_get_widget (xml, "options_dialog"));
-}
-void
-video_codec_options_button_clicked (GtkButton * button)
-{
-	gtranscode_options_button_clicked_id (button, 2);
-}
-
-void
-audio_codec_options_button_clicked (GtkButton * button)
-{
-	gtranscode_options_button_clicked_id (button, 3);
-}
-
-void
-containers_options_button_clicked (GtkButton * button)
-{
-	gtranscode_options_button_clicked_id (button, 1);
-}
-
-void
-sources_options_button_clicked (GtkButton * button)
-{
-	gtranscode_options_button_clicked_id (button, 0);
 }

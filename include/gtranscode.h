@@ -77,6 +77,9 @@ void gtranscode_ui_update (GtkComboBox * combo_box);
 
 void transcode_button_clicked (GtkButton * button);
 
+void
+gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget);
+
 int main (int argc, char *argv[]);
 
 void

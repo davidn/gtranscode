@@ -225,6 +225,10 @@ main (int argc, char *argv[])
 								  text_renderer,
 								  "text",
 								  0,NULL);
+	g_signal_connect( glade_xml_get_widget ( xml, "sources_options_button" ),
+					 "clicked",
+					 (GCallback) gtranscode_options_button_clicked,
+					 glade_xml_get_widget( xml, "sources_combobox"));
 
 	text_renderer = gtk_cell_renderer_text_new();
 	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "container_combobox"));
@@ -233,6 +237,11 @@ main (int argc, char *argv[])
 								  text_renderer,
 								  "text",
 								  0,NULL);
+	g_signal_connect( glade_xml_get_widget ( xml, "containers_options_button" ),
+					 "clicked",
+					 (GCallback) gtranscode_options_button_clicked,
+					 glade_xml_get_widget( xml, "container_combobox"));
+	
 	text_renderer = gtk_cell_renderer_text_new();
 	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "audio_codec_combobox"));
 	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
@@ -240,6 +249,11 @@ main (int argc, char *argv[])
 								  text_renderer,
 								  "text",
 								  0,NULL);
+	g_signal_connect( glade_xml_get_widget ( xml, "audio_codec_options_button" ),
+					 "clicked",
+					 (GCallback) gtranscode_options_button_clicked,
+					 glade_xml_get_widget( xml, "audio_codec_combobox"));
+	
 	text_renderer = gtk_cell_renderer_text_new();
 	cell_layout = GTK_CELL_LAYOUT (glade_xml_get_widget (xml, "video_codec_combobox"));
 	gtk_cell_layout_pack_start(cell_layout, text_renderer,TRUE);
@@ -247,6 +261,10 @@ main (int argc, char *argv[])
 								  text_renderer,
 								  "text",
 								  0,NULL);
+	g_signal_connect( glade_xml_get_widget ( xml, "video_codec_options_button" ),
+					 "clicked",
+					 (GCallback) gtranscode_options_button_clicked,
+					 glade_xml_get_widget( xml, "video_codec_combobox"));
 	
   gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "sources_combobox")),
 						   GTK_TREE_MODEL (sources));

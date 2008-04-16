@@ -78,7 +78,6 @@
                                 <property name="label" translatable="yes">gtk-properties</property>
                                 <property name="use_stock">True</property>
                                 <property name="response_id">0</property>
-                                <signal name="clicked" handler="sources_options_button_clicked"/>
                               </widget>
                             </child>
                           </widget>
@@ -136,7 +135,6 @@
                                 <property name="label" translatable="yes">gtk-properties</property>
                                 <property name="use_stock">True</property>
                                 <property name="response_id">0</property>
-                                <signal name="clicked" handler="containers_options_button_clicked"/>
                               </widget>
                             </child>
                           </widget>
@@ -200,7 +198,6 @@
                                     <property name="label" translatable="yes">gtk-properties</property>
                                     <property name="use_stock">True</property>
                                     <property name="response_id">0</property>
-                                    <signal name="clicked" handler="video_codec_options_button_clicked"/>
                                   </widget>
                                 </child>
                               </widget>
@@ -257,7 +254,6 @@
                                     <property name="label" translatable="yes">gtk-properties</property>
                                     <property name="use_stock">True</property>
                                     <property name="response_id">0</property>
-                                    <signal name="clicked" handler="audio_codec_options_button_clicked"/>
                                   </widget>
                                 </child>
                               </widget>
