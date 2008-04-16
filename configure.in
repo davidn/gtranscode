@@ -100,8 +100,6 @@ AC_SUBST(GLADE_LIBS)
 
 AC_OUTPUT([
 Makefile
-po/Makefile.in
-include/Makefile
 src/Makefile
 gtranscode.desktop
 ])
