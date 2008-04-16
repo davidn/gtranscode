@@ -27,7 +27,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 
-#include "../include/gtranscode.h"
+#include "gtranscode.h"
 
 // char* name, GstElementFactory* element_factory, GList* options ,GtkListStore allowed_audio_codecs, GtkListStore allowed_video_codecs)
 GtkListStore * sources;

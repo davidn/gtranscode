@@ -22,7 +22,7 @@
 #include <gnome.h>
 #include <glade/glade.h>
 
-#include "../include/gtranscode.h"
+#include "gtranscode.h"
 
 GstElement * pipeline;
 GtkListStore * sources, *containers;

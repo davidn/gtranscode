@@ -24,7 +24,7 @@
 #include <glib/gstdio.h>
 #include <gst/gst.h>
 
-#include "../include/gtranscode.h"
+#include "gtranscode.h"
 
 GstElement * pipeline;
 GtkListStore * sources, *containers;

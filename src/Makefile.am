@@ -20,7 +20,7 @@ gtranscode_SOURCES = \
 	main.c\
 	gtranscode-transcode.c\
 	gtranscode-ui-handlers.c\
-	gtranscode-gst-handlers.c
+	gtranscode-gst-handlers.c 
 
 gtranscode_LDFLAGS = \
 	-export-dynamic
@@ -31,4 +31,13 @@ gtranscode_LDADD = \
 	$(GSTREAMER_LIBS)
 
 AM_GCJFLAGS = 
+
+gtranscode_header_HEADERS = \
+	gtranscode.h
+
+gtranscode_headerdir = \
+	$(pkgincludedir)
+
+EXTRA_DIST = \
+	$(gtranscode_header_HEADERS)
 

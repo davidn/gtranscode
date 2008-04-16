@@ -3,7 +3,7 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-SUBDIRS = po include src
+SUBDIRS = po src
 
 gtranscodedocdir = ${prefix}/doc/gtranscode
 gtranscodedoc_DATA = \

@@ -27,7 +27,7 @@
 #include <glib/gstdio.h>
 #endif
 
-#include "../include/gtranscode.h"
+#include "gtranscode.h"
 
 GstElement *pipeline;
 
