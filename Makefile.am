@@ -27,6 +27,8 @@ AM_CXXFLAGS =
 AM_CFLAGS = \
 	-O0
 
+EXTRA_DIST = gtranscode.glade
+
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:
 	for specfile in *.spec; do \
