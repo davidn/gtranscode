@@ -72,6 +72,8 @@ gtranscode_stop_button_clicked (GtkButton * button)
 {
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
+    gnome_appbar_set_progress_percentage ( GNOME_APPBAR(glade_xml_get_widget(xml,"appbar")),
+                                                  0.0);
     gtk_widget_hide ( glade_xml_get_widget (xml, "stop-button"));
     gtk_widget_show ( glade_xml_get_widget (xml, "start-button"));
     /* The gtk functions should really be called in gtranscode_message_state_changed
@@ -92,16 +94,17 @@ gtranscode_transcode_button_clicked (GtkButton * button)
     *container_opts, *audio_codec_opts, *video_codec_opts, *sink_opts;
     gchar *filesrcopts[] = {
         "location",
-        "/home/david/films/Dogma.avi"
+        gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(glade_xml_get_widget (xml, "source_file_chooser_button")))
     };
     gchar *filesinkopts[] = {
         "location",
-        "/tmp/gb.ogg"
+        gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(glade_xml_get_widget (xml, "destination_file_chooser_button")))
     };
     gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "sources_combobox"))
                                    , &iter );
     gtk_tree_model_get_value ( GTK_TREE_MODEL (sources), &iter, 1, &value);
     source_factory = g_value_get_pointer( &value);
+    source_factory = gst_element_factory_find ("filesrc");
     source_opts = NULL;
     source_opts = g_list_append (source_opts, filesrcopts);
     
