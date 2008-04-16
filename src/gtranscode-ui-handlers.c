@@ -150,6 +150,48 @@ gtranscode_transcode_button_clicked (GtkButton * button)
     
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
+
+void
+gtranscode_g_param_spec_add_widget_to_table (GParamSpec * param,
+                                                 GtkContainer * container)
+{
+    GtkWidget * hbox = gtk_hbox_new (FALSE, 0);
+    GtkWidget * label = gtk_label_new(g_param_spec_get_name(param));
+    GtkWidget * widget;
+    gtk_widget_set_tooltip_text(hbox, g_param_spec_get_blurb(param));
+    gtk_container_add (container, hbox);
+    gtk_container_add (hbox, label);
+    switch (G_PARAM_SPEC_VALUE_TYPE (param))
+    {
+      case G_TYPE_STRING:
+      {
+        widget = gtk_entry_new();
+        break;
+      }
+      case G_TYPE_BOOLEAN:
+      {
+        break;
+      }
+      case G_TYPE_ULONG:
+      {
+        break;
+      }
+      case G_TYPE_LONG:
+      case G_TYPE_UINT:
+      case G_TYPE_INT:
+      case G_TYPE_UINT64:
+      case G_TYPE_INT64:
+      case G_TYPE_FLOAT:
+      case G_TYPE_DOUBLE:
+        default:
+        {
+          widget = gtk_label_new("N/A");
+        break;
+    }
+    gtk_widget_show (label);
+    gtk_widget_show (hbox);
+}
+
 void
 gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
 {
@@ -157,7 +199,7 @@ gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
     GstElementFactory * element_factory;
     GValue value = {0, };
     GList *options = NULL;
-    GtkDialog * option_window;
+    GtkWidget * option_window;
     if (gtk_combo_box_get_active_iter (widget,
                                        &iter ) == FALSE )
     {
@@ -172,7 +214,7 @@ gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
     element_factory = g_value_get_pointer(&value);
     
     /*initiase options in ui*/
-    
+        
     option_window = gtk_dialog_new_with_buttons (NULL,
                                                  NULL,
                                                  GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -181,12 +223,15 @@ gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
                                                  GTK_STOCK_CANCEL,
                                                  GTK_RESPONSE_REJECT,
                                                  NULL);
-    switch (gtk_dialog_run(option_window))
+    g_list_foreach (options,
+                    (GFunc) gtranscode_g_param_spec_add_widget_to_table,
+                    GTK_DIALOG(option_window)->vbox);
+    switch (gtk_dialog_run(GTK_DIALOG(option_window)))
     {
         case GTK_RESPONSE_ACCEPT:
         break;
         default:
         break;
     }
-    gtk_widget_destroy(option_window);
+    gtk_widget_destroy(GTK_WIDGET(option_window));
 }

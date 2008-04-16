@@ -25,6 +25,7 @@
 #include <gst/gst.h>
 #include <gst/gstfilter.h>
 #include <glib.h>
+#include <glib-object.h>
 #include <glib/gstdio.h>
 
 #include "gtranscode.h"
@@ -46,7 +47,7 @@ element_factory_add_to_gtk_list_store (GstElementFactory * element_factory, GtkL
     gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
                         0, gst_element_factory_get_longname (element_factory),
                         1, element_factory,
-                        2, NULL,
+                        2, gtranscode_element_factory_get_options(element_factory),
                         3, NULL,
                         4, NULL, -1);
     /*initiase options*/
@@ -108,7 +109,7 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
         gtk_list_store_set ( GTK_LIST_STORE (group), &iter ,
                             0, gst_element_factory_get_longname (element_factory),
                             1, element_factory,
-                            2, NULL,
+                            2, gtranscode_element_factory_get_options(element_factory),
                             3, audio_codecs_list_store,
                             4, video_codecs_list_store, -1);
     }
@@ -124,7 +125,21 @@ element_factory_add_to_gtk_list_store_with_children (GstElementFactory * element
 GList *
 gtranscode_element_factory_get_options (GstElementFactory * element_factory)
 {
+    GstElement * element = gst_element_factory_create ( element_factory , "TEMP" );
+    GList * options = NULL;
+    guint num_properties, i;
+    GParamSpec ** properties;
     
+    properties = g_object_class_list_properties(G_OBJECT_GET_CLASS(element),
+                                                &num_properties);
+    
+    for ( i = 0; i < num_properties ; i ++)
+    {
+        options = g_list_append ( options, properties [i] );
+    }
+    g_free(properties);
+    gst_object_unref (element);
+    return options;
 }
 
 gboolean
