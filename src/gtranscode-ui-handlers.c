@@ -29,6 +29,7 @@
 GstElement * pipeline;
 GtkListStore * sources, *containers;
 GladeXML * xml;
+gchar * source_filename;
 
 void
 gtranscode_ui_update (GtkComboBox * combo_box)
@@ -83,76 +84,91 @@ gtranscode_stop_button_clicked (GtkButton * button)
 void
 gtranscode_transcode_button_clicked (GtkButton * button)
 {
-    GstElementFactory *source_factory,
-    *container_factory,
-    *audio_codec_factory, *video_codec_factory, *sink_factory;
-    GstElement * pipeline;
-    GstBus * bus;
-    GValue value = {0, };
-    GtkTreeIter iter;
-    GList *source_opts,
-    *container_opts, *audio_codec_opts, *video_codec_opts, *sink_opts;
-    gchar *filesrcopts[] = {
-        "location",
-        gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(glade_xml_get_widget (xml, "source_file_chooser_button")))
-    };
-    gchar *filesinkopts[] = {
-        "location",
-        gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(glade_xml_get_widget (xml, "destination_file_chooser_button")))
-    };
-    gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "sources_combobox"))
-                                   , &iter );
-    gtk_tree_model_get_value ( GTK_TREE_MODEL (sources), &iter, 1, &value);
-    source_factory = g_value_get_pointer( &value);
-    source_factory = gst_element_factory_find ("filesrc");
-    source_opts = NULL;
-    source_opts = g_list_append (source_opts, filesrcopts);
-    
-    
-    gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "container_combobox"))
-                                   , &iter );
-    g_value_unset(&value);
-    gtk_tree_model_get_value ( GTK_TREE_MODEL (containers), &iter, 1, &value);
-    container_factory = g_value_get_pointer( &value);
-    container_opts = NULL;
-    
-    
-    gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox"))
-                                   , &iter );
-    g_value_unset(&value);
-    gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox"))),
-                              &iter, 1, &value);
-    audio_codec_factory = g_value_get_pointer( &value);
-    audio_codec_opts = NULL;
-    
-    
-    gtk_combo_box_get_active_iter ( GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox"))
-                                   , &iter );
-    g_value_unset(&value);
-    gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox"))),
-                              &iter, 1, &value);
-    video_codec_factory = g_value_get_pointer( &value);
-    video_codec_opts = NULL;
-    
-    
-    sink_factory = gst_element_factory_find ("filesink");
-    sink_opts = NULL;
-    sink_opts = g_list_append (sink_opts, filesinkopts);
-    pipeline = transcode (source_factory, source_opts, container_factory, container_opts,
-                          audio_codec_factory, audio_codec_opts, video_codec_factory,
-                          video_codec_opts, sink_factory, sink_opts);
-    
-    bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
-    gst_bus_add_signal_watch (bus);
-    g_signal_connect (bus, "message::error", G_CALLBACK (gtranscode_message_error), NULL);
-    g_signal_connect (bus, "message::eos", G_CALLBACK (gtranscode_message_eos), NULL);
-    g_signal_connect (bus, "message::state-changed", G_CALLBACK( gtranscode_message_state_changed),NULL);
-    gst_object_unref(bus);
-    
-    g_timeout_add (200, (GSourceFunc) gtranscode_ui_update_position, NULL);
-    
-    gst_element_set_state (pipeline, GST_STATE_PLAYING);
+  GstElementFactory *source_factory,
+  *container_factory,
+  *audio_codec_factory, *video_codec_factory, *sink_factory;
+  GstElement * pipeline;
+  GstBus * bus;
+  GValue value = {0, };
+  GtkTreeIter iter;
+  GList *source_opts,
+        *container_opts,
+        *audio_codec_opts,
+        *video_codec_opts,
+        *sink_opts;
+  gchar *filesinkopts[] = {"location", NULL};
+  gchar *filesrcopts[] = {
+    "location",
+    source_filename
+  };
+  GtkWidget * file_chooser_dialog = gtk_file_chooser_dialog_new ("Save as",
+                                                                 NULL,
+                                                                 GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                                 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                                                 NULL);
+  if (gtk_dialog_run (GTK_DIALOG (file_chooser_dialog)) == GTK_RESPONSE_ACCEPT)
+  {
+    filesinkopts[1] = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (file_chooser_dialog));
+    gtk_widget_hide (file_chooser_dialog);
+  }
+  else
+  {
+    return;
+  }
+  gtk_combo_box_get_active_iter (GTK_COMBO_BOX( glade_xml_get_widget (xml, "sources_combobox")),
+                                 &iter );
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (sources), &iter, 1, &value);
+  source_factory = g_value_get_pointer( &value);
+  source_factory = gst_element_factory_find ("filesrc");
+  source_opts = NULL;
+  source_opts = g_list_append (source_opts, filesrcopts);
+
+
+  gtk_combo_box_get_active_iter (GTK_COMBO_BOX( glade_xml_get_widget (xml, "container_combobox")),
+                                 &iter );
+  g_value_unset(&value);
+  gtk_tree_model_get_value ( GTK_TREE_MODEL (containers), &iter, 1, &value);
+  container_factory = g_value_get_pointer( &value);
+  container_opts = NULL;
+
+
+  gtk_combo_box_get_active_iter (GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox")),
+                                 &iter );
+  g_value_unset(&value);
+  gtk_tree_model_get_value (gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "audio_codec_combobox"))),
+                            &iter, 1, &value);
+  audio_codec_factory = g_value_get_pointer( &value);
+  audio_codec_opts = NULL;
+
+
+  gtk_combo_box_get_active_iter (GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox")),
+                                 &iter );
+  g_value_unset(&value);
+  gtk_tree_model_get_value ( gtk_combo_box_get_model(GTK_COMBO_BOX( glade_xml_get_widget (xml, "video_codec_combobox"))),
+                            &iter, 1, &value);
+  video_codec_factory = g_value_get_pointer( &value);
+  video_codec_opts = NULL;
+
+
+  sink_factory = gst_element_factory_find ("filesink");
+  sink_opts = NULL;
+  sink_opts = g_list_append (sink_opts, filesinkopts);
+  pipeline = transcode (source_factory, source_opts, container_factory, container_opts,
+                        audio_codec_factory, audio_codec_opts, video_codec_factory,
+                        video_codec_opts, sink_factory, sink_opts);
+
+  bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
+  gst_bus_add_signal_watch (bus);
+  g_signal_connect (bus, "message::error", G_CALLBACK (gtranscode_message_error), NULL);
+  g_signal_connect (bus, "message::eos", G_CALLBACK (gtranscode_message_eos), NULL);
+  g_signal_connect (bus, "message::state-changed", G_CALLBACK( gtranscode_message_state_changed),NULL);
+  gst_object_unref(bus);
+
+  g_timeout_add (200, (GSourceFunc) gtranscode_ui_update_position, NULL);
+
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
+
 void
 gtranscode_options_button_clicked (GtkButton * button, GtkComboBox * widget)
 {

@@ -32,6 +32,7 @@
 // char* name, GstElementFactory* element_factory, GList* options ,GtkListStore allowed_audio_codecs, GtkListStore allowed_video_codecs)
 GtkListStore * sources;
 GtkListStore * containers;
+gchar * source_filename;
 
 GstElement *pipeline;
 
@@ -181,6 +182,7 @@ int
 main (int argc, char *argv[])
 {
     /*GstRegistry *registry; */
+    GtkWidget * file_chooser_dialog;
     GtkCellRenderer * text_renderer;
     GtkCellLayout * cell_layout;
 #ifdef ENABLE_NLS
@@ -196,7 +198,6 @@ main (int argc, char *argv[])
     xml = glade_xml_new (PACKAGE_SOURCE_DIR "/gtranscode.glade", NULL, NULL);
     /* This is important */
     glade_xml_signal_autoconnect (xml);
-    gtk_widget_show (glade_xml_get_widget (xml, "gtranscode_app"));
     
     sources = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER , G_TYPE_OBJECT, G_TYPE_OBJECT);
     containers = gtk_list_store_new ( 5 ,  G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER , G_TYPE_OBJECT, G_TYPE_OBJECT);
@@ -254,6 +255,22 @@ main (int argc, char *argv[])
                              GTK_TREE_MODEL (sources));
     gtk_combo_box_set_model ( GTK_COMBO_BOX (glade_xml_get_widget (xml, "container_combobox")),
                              GTK_TREE_MODEL (containers));
+    
+    file_chooser_dialog = gtk_file_chooser_dialog_new ("Open media file",
+                                                       NULL,
+                                                       GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                                       NULL);
+  if (gtk_dialog_run (GTK_DIALOG (file_chooser_dialog)) == GTK_RESPONSE_ACCEPT)
+  {
+    source_filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (file_chooser_dialog));
+    gtk_widget_hide (file_chooser_dialog);
+    gtk_widget_show (glade_xml_get_widget (xml, "gtranscode_app"));
     gtk_main ();
+  }
+  else
+  {
+      exit (1);
+  }
     return 0;
 }
