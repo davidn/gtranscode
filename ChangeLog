@@ -1,0 +1,7 @@
+gtranscode 0.1  2008-05-13
+
+* Initial Release.  Features are:
+
+* Any gstreamer-supported file input
+* Most gstreamer-supported file formats and codecs
+* Simple interface for transcoding

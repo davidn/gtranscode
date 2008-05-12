@@ -1,0 +1,57 @@
+Gtranscode Readme
+-----------------
+
+Gtranscode is a program for "transcoding" video files.  This means it changes
+the file format.  For example you can use it to change a .avi file to a .ogg
+file.  This is useful as ogg will be more widely supported under linux systems.
+
+This readme is in two parts, Installation and Use.
+
+-------------------------------------------------------------------------------
+
+I. Installation
+
+ To build gtranscode extract the tarball:
+   tar -zxf gtranscode*.tar.gz
+
+ Change directory to the source:
+   cd gtranscode*
+
+ Configure the system:
+   ./configure
+ You can see configuration options by running
+   ./configure --help
+
+ Compile the program:
+   make
+
+ Install the program:
+   make install
+
+-------------------------------------------------------------------------------
+
+II. Use
+
+ To run gtranscode, first start the program
+   gtranscode
+ (if you have compiled the program but not installed it, you can run
+   src/gtranscode from the source directory)
+
+ Then you must select the file that you wish to transcode from.  The main dialog then appears.  First you must select the file format you want.  The most common formats are:
+
+ AVI  - a widely used format under Windows and Linux.
+ OGG  - a format designed for both flexibilty and freedom from patents.
+ MPEG - This format is encumbered by patents but widely supported by software
+        and hardware such as Digital TV recorders.
+
+After selecting the target file format, the audio and video codecs must be selected.  These determine how the sound and video is represented digitally.
+
+For Ogg, you almost certainly want Vorbis audio and Theora Video.
+
+For Avi, you probably want mp3 audio if the option is available; AC-3 audio also works well.  MPEG-4 and XVID/DIVX good video codecs to use.
+
+For MPEG you probably want mp3 audio and MPEG-2 Video.
+
+When you have chosen all the settings, press start to begin the transcoding.
+Gtranscode will ask you for a filename to save the new video as.  After choosing the process begins.  A progress bar is shown.  The process can be stopped at
+any time with the stop button.
