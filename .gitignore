@@ -35,4 +35,5 @@
 !src/gtranscode-transcode.c
 !src/gtranscode-ui-handlers.c
 !src/main.c
+!/src/gtranscode.h
 !stamp-h.in
