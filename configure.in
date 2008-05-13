@@ -13,12 +13,14 @@ AC_PROG_CC
 AM_PROG_CC_STDC
 AC_HEADER_STDC
 
+AC_PROG_INTLTOOL([0.23])
+
 GETTEXT_PACKAGE=gtranscode
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Package name for gettext])
 
 dnl Languages which your application supports
-ALL_LINGUAS=""
+ALL_LINGUAS="en_GB fr"
 AM_GLIB_GNU_GETTEXT
 
 AM_PROG_LIBTOOL
@@ -101,6 +103,7 @@ AC_SUBST(GLADE_LIBS)
 AC_OUTPUT([
 Makefile
 src/Makefile
-gtranscode.desktop
+po/Makefile.in
+gtranscode.desktop.in
 ])
 
