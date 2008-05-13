@@ -1,0 +1,5 @@
+src/gtranscode-gst-handlers.c
+src/gtranscode-transcode.c
+src/gtranscode-ui-handlers.c
+src/main.c
+gtranscode.glade

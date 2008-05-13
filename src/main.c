@@ -26,6 +26,7 @@
 #include <gst/gstfilter.h>
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <libgnome/gnome-i18n.h>
 
 #include "gtranscode.h"
 
