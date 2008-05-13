@@ -35,7 +35,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = gtranscode$(EXEEXT)
 subdir = src
-DIST_COMMON = $(gtranscode_header_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -45,8 +45,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(gtranscode_headerdir)"
+am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_gtranscode_OBJECTS = main.$(OBJEXT) gtranscode-transcode.$(OBJEXT) \
@@ -73,14 +72,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(gtranscode_SOURCES)
 DIST_SOURCES = $(gtranscode_SOURCES)
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-gtranscode_headerHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(gtranscode_header_HEADERS)
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -277,14 +269,8 @@ gtranscode_LDADD = \
 	$(GSTREAMER_LIBS)
 
 AM_GCJFLAGS = 
-gtranscode_header_HEADERS = \
+noinst_HEADERS = \
 	gtranscode.h
-
-gtranscode_headerdir = \
-	$(pkgincludedir)
-
-EXTRA_DIST = \
-	$(gtranscode_header_HEADERS)
 
 all: all-am
 
@@ -388,23 +374,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-gtranscode_headerHEADERS: $(gtranscode_header_HEADERS)
-	@$(NORMAL_INSTALL)
-	test -z "$(gtranscode_headerdir)" || $(MKDIR_P) "$(DESTDIR)$(gtranscode_headerdir)"
-	@list='$(gtranscode_header_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(gtranscode_headerHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(gtranscode_headerdir)/$$f'"; \
-	  $(gtranscode_headerHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(gtranscode_headerdir)/$$f"; \
-	done
-
-uninstall-gtranscode_headerHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(gtranscode_header_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(gtranscode_headerdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(gtranscode_headerdir)/$$f"; \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -483,7 +452,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(gtranscode_headerdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -530,7 +499,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-gtranscode_headerHEADERS
+install-data-am:
 
 install-dvi: install-dvi-am
 
@@ -566,7 +535,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-gtranscode_headerHEADERS
+uninstall-am: uninstall-binPROGRAMS
 
 .MAKE: install-am install-strip
 
@@ -575,15 +544,14 @@ uninstall-am: uninstall-binPROGRAMS uninstall-gtranscode_headerHEADERS
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am \
-	install-gtranscode_headerHEADERS install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-gtranscode_headerHEADERS
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

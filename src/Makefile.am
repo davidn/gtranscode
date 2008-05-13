@@ -32,12 +32,5 @@ gtranscode_LDADD = \
 
 AM_GCJFLAGS = 
 
-gtranscode_header_HEADERS = \
+noinst_HEADERS = \
 	gtranscode.h
-
-gtranscode_headerdir = \
-	$(pkgincludedir)
-
-EXTRA_DIST = \
-	$(gtranscode_header_HEADERS)
-
