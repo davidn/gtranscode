@@ -52,6 +52,7 @@ element_factory_add_to_gtk_list_store (GstElementFactory * element_factory, GtkL
                         3, NULL,
                         4, NULL, -1);
     /*initiase options*/
+    :)
 }
 
 void
